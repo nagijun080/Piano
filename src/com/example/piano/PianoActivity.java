@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.Path;
+import android.graphics.Path.Direction;
 import android.graphics.Region;
 import android.graphics.drawable.Drawable;
 import android.view.Menu;
@@ -93,8 +94,49 @@ public class PianoActivity extends Activity implements OnTouchListener{
 		path[1].lineTo(0, kh);
 		path[1].lineTo(kw, kh);
 		path[1].lineTo(kw, bkh);
+		path[1].lineTo(kw - (bkw /2), bkh);
+		path[1].lineTo(kw - (bkw /2), 0);
+		path[1].close();
 		
+		//左に黒鍵のある白鍵
+		path[2].moveTo(bkw / 2, 0);
+		path[2].moveTo(bkw / 2, bkh);
+		path[2].moveTo(0, bkh);
+		path[2].moveTo(0, kh);
+		path[2].moveTo(kw, kh);
+		path[2].moveTo(kw, 0);
+		path[2].close();
+		
+		//黒鍵
+		path[3].addRect(0, 0, bkw, bkh, Direction.CCW);
+		
+		//Pathオブジェクトの情報を使用してRegionオブジェクトを作成し、キーごとに割り当てる
+		Region region = new Region (0, 0, sw, sh);
+		int kt[] = new int[] {0,1,2,0,1,1,2,0,3,3,-1,3,3,3,-1,3,3};
+		
+		for (int i = 0;i < numWk;i++) {
+			kb[i] = new Region();
+			Path pathtmp = new Path();
+			pathtmp.addPath(path[kt[i]], i * kw, 0);
+			kb[i].setPath(pathtmp, region);
+		}
+		int j = numWk;
+		for (int i = numWk;i < kt.length;i++) {
+			if(kt[i] != -1) {
+				kb[j] = new Region();
+				Path pathtmp = new Path();
+				pathtmp.addPath(path[kt[i]],(i - numWk + 1) * kw - (bkw / 2), 0);
+				kb[j].setPath(pathtmp, region);
+				j = j + 1;
+			}
+		}
 	}
-
+	
+	public Bitmap drawKeys() {
+		
+		
+		return null;
+	}
   
 }
+
